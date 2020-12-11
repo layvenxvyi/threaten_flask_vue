@@ -1,0 +1,1 @@
+py环境路径，如/xx/xx/bin/python3 /xx/xx/xx/manage.py runserver -p 8082 -h 0.0.0.0
