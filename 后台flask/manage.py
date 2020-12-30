@@ -11,22 +11,22 @@ from increment.tencentThreaten import getpage,getThreaten_tencent
 # from increment.cnnvdThreaten import getcnnvd_count,getThreaten_cnnvd
 from increment.nsfocusThreaten import get_now,getThreaten_nsfocus
 from type_difinite import data_classify
-import json,ast
+import json
 import requests
 import pymysql
 pymysql.install_as_MySQLdb()
 from flask_cors import CORS
 
 app=Flask(__name__)
-cors = CORS(app, resources={r"/.*": {"origins": ["http://localhost:8080"]}})   # 因为前后端分离一定有跨域问题，所以需要配置只允许特定几个域名跨域
-db=SQLAlchemy(app)# 创建数据库连接对象
+cors = CORS(app, resources={r"/.*": {"origins": ["http://127.0.0.1:8080"]}})   # 因为前后端分离一定有跨域问题，所以需要配置只允许特定几个域名跨域
 
 class Config(object):
     #sqlalchemy的配置参数
-    SQLALCHEMY_DATABASE_URI="mysql://数据库名:数据库密码@127.0.0.1:3306/表名"#需要设置为自己的
+    SQLALCHEMY_DATABASE_URI="mysql://dbuser:dbpwd@127.0.0.1:3306/dbname"#需要设置为自己的
     #设置sqlalchemy自动跟踪数据库
     SQLALCHEMY_TRACK_MODIFICATIONS=True
 app.config.from_object(Config)# 加载配置
+db=SQLAlchemy(app)# 创建数据库连接对象
 
 class threaten_test(db.Model):#表选项
     __tablename__='threaten_test'  #设置表名
@@ -50,7 +50,7 @@ class threaten_if_update(db.Model):
 
 @app.route('/')
 def index():
-    return render_template('helloworld.html')
+    return {'hello':'threaten!'}
 
 @app.route('/query_threaten',methods=['GET', 'POST'])
 def getdata():
@@ -130,8 +130,8 @@ def return_data(select_val,pageid):#单独函数处理筛选的数据
 
 class updata_Threaten(object):#更新爬取数据的类
     def __init__(self):
-        self.ali_if_update()
-        self.tencent_if_update()
+        # self.ali_if_update()
+        # self.tencent_if_update()
         # self.cnnvd_if_update()
         self.nsfocus_if_update()
         self.data_deal()
@@ -217,16 +217,14 @@ class updata_Threaten(object):#更新爬取数据的类
             type='web应用'
         else:
             type='其他'
-        content_data = "<a href='http://192.168.43.218:8888/query_threaten'>点击查看以往威胁情报</a >" + \
+        content_data = "<a href='http://192.168.43.218:8080/query_threaten'>点击查看以往威胁情报</a >" + \
                         '\n\n' + content.name + '\n' + str(content.time) + '\n' + '原始链接：' + content.urlhref + '\n' + \
                         '命中类型/关键字：' + type + '/' + shotkey + '\n' + '漏洞详情：' + content.urldetail
         # //内容类型 1表示文字 2表示html(只发送body标签内部的数据即可，不包括body标签) 3表示markdown
         url = 'http://wxpusher.zjiecode.com/api/send/message'
-        #测试用
+        #使用自己的token及主题id
         params = {"appToken": "此处请填入自己注册的appToken",
-                  "content": content_data, "contentType": 1, "topicIds": [428], "uids": [], "url": "http://192.168.43.218:8888/query_threaten"}
-        #生产用
-        #params = {"appToken": "AT_3495kNy5v0ScRIMu0lHo7Yu56L2rtByB","content": content_data, "contentType": 1, "topicIds": [402], "uids": [], "url": "http://www.pingan-wifi.club:8888/query_threaten"}
+                  "content": content_data, "contentType": 1, "topicIds": [428], "uids": [], "url": "http://192.168.43.218:8080/query_threaten"}
         params = json.dumps(params)
         headers = {'Content-Type': 'application/json', }
         html = requests.post(url, data=params, headers=headers)
@@ -237,7 +235,7 @@ def scheduler_func():
     scheduler = BackgroundScheduler()  # 非阻塞 A scheduler that runs in the background using a separate thread
     try:
         #测试
-        scheduler.add_job(func=updata_Threaten, trigger='cron', second='*/1000', id='start_update')
+        scheduler.add_job(func=updata_Threaten, trigger='cron', second='*/10', id='start_update')
         #生产
         #scheduler.add_job(func=updata_Threaten, trigger='cron', hour='*/2', id='start_update')
         scheduler.start()

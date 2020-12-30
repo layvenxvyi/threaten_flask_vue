@@ -14,7 +14,7 @@
 - /templates 前端模版
 
 ##运行
--   1/按照manage的26行建立mysql数据库，并在21行重设数据库密码
+-   1/按照manage的31-50行建立mysql数据库，并在25行重设数据库参数
 -   2/需要先执行fullAount_oneexecute全量跑一波数据再导入excel，也可忽略此步，忽略即没有存量漏洞数据；或者在other中的xlsx直接导入mysql数据库中做存量数据
 -   3/cnnvd的数据质量差，代码中已注释，是否需要可自行解除注释
 -   4/使用微信推送需要自己先[登录](https://wxpusher.zjiecode.com/docs/#/)注册，manage的197和213行填入自己申请到的appToken和主题模板

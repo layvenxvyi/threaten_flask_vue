@@ -1,7 +1,8 @@
 let menu = {
     menus: [
         {
-            key: '/query_threaten', desc: '查看详情', icon: 'fa fa-desktop'
+            key: '/query_threaten', desc: '查看详情', icon: 'fa fa-desktop',subs:[
+            {key:'/hello',desc:'测试页面'}]
         },
         // {
         //     key: '1', desc: '用户管理', icon: 'fa fa-address-card',subs: [
