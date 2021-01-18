@@ -18,7 +18,7 @@
 -   2/需要先执行fullAount_oneexecute全量跑一波数据再导入excel，也可忽略此步，忽略即没有存量漏洞数据；或者在other中的xlsx直接导入mysql数据库中做存量数据
 -   3/cnnvd的数据质量差，代码中已注释，是否需要可自行解除注释
 -   4/使用微信推送需要自己先[登录](https://wxpusher.zjiecode.com/docs/#/)注册，manage的197和213行填入自己申请到的appToken和主题模板
--   5/下载依赖pip3 -r install requirements.txt，之后直接运行manage.py即可运行整个程序
+-   5/下载依赖pip3 install -r requirements.txt，之后直接运行manage.py即可运行整个程序
 
 ##效果图
 ![效果图](./other/微信效果图.png "效果图")
