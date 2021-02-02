@@ -14,12 +14,17 @@ class paramItem(object):
     now_totalCount=None
 
 def getTotalCount():
+    totalCount=[]
     getContent = requests.get('https://help.aliyun.com/notice_list_page/9213612/1.html')
     html = etree.HTML(getContent.text)
-    page = html.xpath("//script[last()]/text()")
-    string1 = str(page[0])#转换类型string
-    list1= string1.split(":")#取值处理
-    totalCount = int(list1[1].split(",")[0])#获取总条数
+    date=html.xpath("//ul/li/span[@class='y-right']/text()")
+    time=html.xpath("//ul/li//span[@class='time']/text()")
+    for i in range(len(date)):
+        totalCount.append(date[i]+' '+time[i])# 设置目前的时间为标准线
+    # page = html.xpath("//script[last()]/text()")
+    # string1 = str(page[0])#转换类型string
+    # list1= string1.split(":")#取值处理
+    # totalCount = int(list1[1].split(",")[0])#获取总条数
     return totalCount
 
 class getThreaten_ali(object):
@@ -34,7 +39,11 @@ class getThreaten_ali(object):
         # print getContent.text
         html = etree.HTML(getContent.text)
         item.name = html.xpath("//ul/li/a/text()")#赋予属性值
-        item.time = html.xpath("//ul/li/span/text()")
+        item.time=[]
+        date = html.xpath("//ul/li/span[@class='y-right']/text()")
+        time = html.xpath("//ul/li//span[@class='time']/text()")
+        for i in range(len(date)):
+            item.time.append(date[i] + ' ' + time[i])  #日期+时间
         item.urlhref = html.xpath("//ul/li/a/@href")
         urldetail=[]
         for i in range(len(item.urlhref)):
@@ -48,8 +57,8 @@ class getThreaten_ali(object):
                 newtext = str(text).strip()
                 resstr += newtext + '\n'
             urldetail.append(resstr)
+        item.now_totalCount=item.time[0]
         item.urldetail = urldetail
-        item.now_totalCount=getTotalCount()
         items.append(item)
         return items
 
