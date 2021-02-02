@@ -45,9 +45,9 @@ class threaten_test(db.Model):#表选项
 
 class threaten_if_update(db.Model):
     __tablename__='threaten_if_update'
-    origin=db.Column(db.Integer(),index=True)
-    totalcount=db.Column(db.Integer(),primary_key=True)
-
+    origin=db.Column(db.Integer(),index=True,primary_key=True)
+    totalcount=db.Column(db.String())
+    
 @app.route('/')
 def index():
     return {'hello':'threaten!'}
@@ -151,20 +151,22 @@ class updata_Threaten(object):#更新爬取数据的类
         db.session.commit()
 
     def ali_if_update(self):
-        new_totalCount=getTotalCount()
+        new_totalCount=getTotalCount()#取时间值的列表，非上次爬取的总条数，因为阿里云默认返回200条数，不再增加
         old_totalCount=threaten_if_update.query.filter_by(origin='1').first()
-        if new_totalCount>old_totalCount.totalcount:
-            ali_updataCount=new_totalCount-old_totalCount.totalcount
-            item=getThreaten_ali().items
+        ali_updataCount=0
+        if old_totalCount.totalcount in new_totalCount:
+            ali_updataCount=new_totalCount.index(old_totalCount.totalcount)
+        item=getThreaten_ali().items
+        if ali_updataCount>0:
             self.update_data(item,ali_updataCount)
         else:
             print('阿里云没有更新')
-
+            
     def tencent_if_update(self):
         new_totalCount=getpage()
         old_totalCount=threaten_if_update.query.filter_by(origin='2').first()
-        if new_totalCount>old_totalCount.totalcount:
-            tencent_updateCount=new_totalCount-old_totalCount.totalcount
+        if new_totalCount>int(old_totalCount.totalcount):
+            tencent_updateCount=new_totalCount-int(old_totalCount.totalcount)
             item=getThreaten_tencent().items
             self.update_data(item,tencent_updateCount)
         else:
@@ -185,7 +187,7 @@ class updata_Threaten(object):#更新爬取数据的类
         old_totalCount = threaten_if_update.query.filter_by(origin='4').first()
         nsfocus_updateCount=0
         for i in new_totalCount:
-            if i>old_totalCount.totalcount:
+            if i>int(old_totalCount.totalcount):
                 nsfocus_updateCount+=1
         item = getThreaten_nsfocus().items
         # nsfocus_updateCount-=(8-len(item[0].name))
@@ -193,6 +195,7 @@ class updata_Threaten(object):#更新爬取数据的类
             self.update_data(item,nsfocus_updateCount)
         else:
             print('绿盟没有更新')
+            
     def data_deal(self):#结果一份推送，一份写入数据库
         orgin_name = threaten_test.query.filter_by(shottype=None).all()
         for i in orgin_name:
